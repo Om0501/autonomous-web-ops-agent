@@ -1,0 +1,4 @@
+workflow,destination,source,domain
+competitor,Goa,rivalstays,rivalstays.example
+pricing,Goa,stayhub,stayhub.example
+campaign,Goa,ownlanding,ownlanding.example/campaigns

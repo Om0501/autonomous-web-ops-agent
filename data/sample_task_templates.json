@@ -1,0 +1,5 @@
+[
+  { "workflow": "competitor", "destination": "Goa", "frequency": "Daily", "routing": "Alert on material change" },
+  { "workflow": "pricing", "destination": "Goa", "frequency": "Daily", "routing": "Dashboard + summary" },
+  { "workflow": "campaign", "destination": "Goa", "frequency": "Campaign-triggered", "routing": "Export for review" }
+]
