@@ -1,0 +1,4 @@
+node_modules/
+webops.db
+webops.db-*
+.env
