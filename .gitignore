@@ -1,4 +1,7 @@
-node_modules/
-webops.db
-webops.db-*
 .env
+*.db
+*.db-*
+data/runtime_snapshots/
+__pycache__/
+.pytest_cache/
+.venv/
