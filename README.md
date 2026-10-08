@@ -26,6 +26,91 @@ extraction → snapshot comparison → reasoning loop → completion (summary, a
 macOS / Linux: `python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt &&
 python -m playwright install chromium && uvicorn backend.api.main:app --port 8000`.
 
+## Deploy
+
+The app is deployed on **Render** (free plan) with the **Blueprint** feature. A Blueprint reads
+[`render.yaml`](render.yaml) from the repository and creates the service for you, so there is nothing to
+configure by hand except the secret values.
+
+> The screenshots below are illustrative and use sample values only (fake URL and fake keys).
+> The numbered markers match the steps.
+
+**What `render.yaml` sets up**
+
+```yaml
+services:
+  - type: web
+    name: mmt-web-ops-agent
+    runtime: docker
+    dockerfilePath: deployment/docker/Dockerfile
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: PUBLIC_BASE_URL        # sync: false = Render asks for the value
+      - key: DOMAIN_ALLOWLIST
+      - key: ANTHROPIC_API_KEY
+      - key: AVIATIONSTACK_API_KEY
+      - key: SNAPSHOT_DIR
+        value: /tmp/snapshots
+```
+
+One Docker web service, built from `deployment/docker/Dockerfile`, health-checked on `/api/health`.
+Variables marked `sync: false` are never stored in the repository; Render asks for them during setup.
+
+### Step 1: Create a Blueprint
+
+In the Render dashboard click **+ New** (1) and choose **Blueprint** (2).
+
+![New Blueprint](docs/screenshots/13_render_new_blueprint.png)
+
+### Step 2: Connect the repository
+
+Pick this GitHub repository and click **Connect** (3). If it is not listed, give Render's GitHub app
+access to the repository first.
+
+![Connect repository](docs/screenshots/14_render_connect_repo.png)
+
+### Step 3: Fill in the environment variables and deploy
+
+Render shows the Blueprint name, branch (`main`) and the service it found in `render.yaml`. Fill in the
+variables it asks for (4):
+
+| Variable | What to enter |
+| --- | --- |
+| `PUBLIC_BASE_URL` | The service URL, e.g. `https://<your-service>.onrender.com` |
+| `DOMAIN_ALLOWLIST` | `localhost,127.0.0.1,<your-service>.onrender.com,api.aviationstack.com` (comma separated, no spaces) |
+| `ANTHROPIC_API_KEY` | Your Anthropic API key (optional: without it the agent runs fully deterministic) |
+| `AVIATIONSTACK_API_KEY` | Your Aviationstack key (only needed for the live flight-status workflow) |
+
+Then click **Deploy Blueprint** (5).
+
+![Blueprint configuration and environment variables](docs/screenshots/15_render_blueprint_config.png)
+
+Tip: the exact `onrender.com` URL is only known after the first deploy. If you didn't know it yet, enter a
+placeholder, then update `PUBLIC_BASE_URL` and `DOMAIN_ALLOWLIST` in Step 4. The deployed host must be in
+`DOMAIN_ALLOWLIST`, otherwise the policy engine refuses to browse the bundled demo sources.
+
+### Step 4: Add or change the API key later (Environment tab)
+
+Open the service, go to **Environment** and add or edit the key, e.g. `ANTHROPIC_API_KEY` (6). Values are
+hidden after saving. Click **Save, rebuild, and deploy** (7) so the new value takes effect.
+
+![Environment variables](docs/screenshots/16_render_environment.png)
+
+Keep keys only in Render's Environment settings (or a local `.env`, which is git-ignored). Never commit
+them to the repository.
+
+### Step 5: Check that it is live
+
+The **Logs** tab shows the Docker build, the health check on `/api/health` returning `200 OK`, and the
+public URL once the service is live (8).
+
+![Deploy logs](docs/screenshots/17_render_deploy_live.png)
+
+**Free-plan notes:** the service sleeps after about 15 minutes without traffic, so the first request
+afterwards takes a while to wake it. Files under `/tmp` (snapshots, Aviationstack cache and request
+counter) are reset on every redeploy or restart. Pushing to `main` redeploys automatically.
+
 ## Watching the agent work
 
 - **Live browsers** (sidebar) shows every running workflow with its latest browser frame.
