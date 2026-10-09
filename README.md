@@ -8,7 +8,7 @@ extraction → snapshot comparison → reasoning loop → completion (summary, a
 
 > **Deployed application:** [https://mmt-web-ops-agent-g2bj.onrender.com/](https://mmt-web-ops-agent-g2bj.onrender.com/)
 > **Interactive demo (no backend needed):** open [`frontend/index.html`](frontend/index.html) directly; it detects that no API is reachable and runs the same pipeline in the browser against bundled sample sources.
-> **Demonstration video:** [Watch the demo on Google Drive]((https://drive.google.com/file/d/1EPbdnJxDRkxw2jKSWDwJmktAPc13vM3s/view?usp=sharing))
+> **Demonstration video:** [Watch the demo on Google Drive](https://drive.google.com/file/d/1EPbdnJxDRkxw2jKSWDwJmktAPc13vM3s/view?usp=sharing)
 
 ![Live browser view](docs/screenshots/01_live_browser_booking.png)
 
